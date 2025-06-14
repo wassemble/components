@@ -1,0 +1,6 @@
+package wassemble:hello-world;
+
+/// An example world for the component to target.
+world main {
+    export hello-world: func() -> string;
+}

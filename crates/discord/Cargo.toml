@@ -15,10 +15,9 @@ crate-type = ["cdylib"]
 [package.metadata.component]
 package = "wassemble:discord"
 
-[package.metadata.component.bindings]
-# derives = ["serde::Serialize", "serde::Deserialize"]
-
-[package.metadata.component.dependencies]
+[package.metadata.component.target]
+path = "wit"
+world = "main"
 
 [package.metadata.component.target.dependencies]
 "wasi:cli" = { path = "./wit/deps/wasi-cli-0.2.5" }

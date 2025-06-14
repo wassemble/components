@@ -11,6 +11,7 @@ env:
 permissions:
   contents: read
   packages: write
+  id-token: write
 
 jobs:
   detect-changes:
@@ -25,7 +26,7 @@ jobs:
       - id: set-matrix
         run: .github/scripts/detect-changes.sh
 
-  build-and-publish:
+  publish:
     needs: detect-changes
     if: ${{ fromJson(needs.detect-changes.outputs.matrix).component != '[]' }}
     runs-on: ubuntu-latest
@@ -39,26 +40,24 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: cargo-bins/cargo-binstall@main
       - run: cargo binstall --locked --force cargo-component
-      - run: cargo binstall --locked --force wkg
-      
-      # Build
-      - run: cargo component build -p ${{ matrix.component }} --release
 
-      # Authentication
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # Configure registry
+      - run: |
+          cat > config.toml << EOF
+          default_registry = "ghcr.io"
+          [registry."ghcr.io".oci.auth]
+          password = "${{ secrets.GH_TOKEN }}"
+          username = "wassemble"
+          EOF
 
       # Publish
-      - run: wkg publish target/wasm32-wasip1/release/$(echo ${{ matrix.component }} | tr '-' '_').wasm --registry ghcr.io
+      - run: |
+          cargo component publish -p ${{ matrix.component }} --config config.toml
 
       # Make package public
       - run: |
-          echo "Making package public..."
           curl -X PATCH \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/user/packages/container/${{ matrix.component }}/visibility \
+            https://api.github.com/orgs/wassemble/packages/container/${{ matrix.component }}/visibility \
             -d '{"visibility":"public"}'

@@ -2,7 +2,7 @@ bindings component:
     cd crates/{{component}} && wkg wit fetch && cargo component bindings
 
 build component: (bindings component)
-    cargo component build -p {{component}} --release
+    cargo component build -p {{component}}
 
 check:
     cargo +nightly fmt
@@ -21,6 +21,9 @@ install:
 new component:
     cargo component new --editor none --lib --namespace wassemble crates/{{component}}
 
-publish component: (build component)
+publish component:
+    cargo component publish -p {{component}}
+
+wit component: (build component)
     @safe_component=$(echo {{component}} | tr '-' '_') && \
-    wkg oci push ghcr.io/wassemble/{{component}}:latest target/wasm32-wasip1/release/$safe_component.wasm
+    wasm-tools component wit target/wasm32-wasip1/debug/$safe_component.wasm
