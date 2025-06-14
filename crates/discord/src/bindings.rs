@@ -590,7 +590,7 @@ pub trait Guest {
     ) -> _rt::String;
 }
 #[doc(hidden)]
-macro_rules! __export_world_discord_cabi {
+macro_rules! __export_world_main_cabi {
     ($ty:ident with_types_in $($path_to_types:tt)*) => {
         const _ : () = { #[unsafe (export_name = "create-webhook")] unsafe extern "C" fn
         export_create_webhook(arg0 : * mut u8, arg1 : usize, arg2 : * mut u8, arg3 :
@@ -641,7 +641,7 @@ macro_rules! __export_world_discord_cabi {
     };
 }
 #[doc(hidden)]
-pub(crate) use __export_world_discord_cabi;
+pub(crate) use __export_world_main_cabi;
 #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
 #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
 struct _RetArea([::core::mem::MaybeUninit<u8>; 9 * ::core::mem::size_of::<*const u8>()]);
@@ -9004,23 +9004,23 @@ mod _rt {
 /// ```
 #[allow(unused_macros)]
 #[doc(hidden)]
-macro_rules! __export_discord_impl {
+macro_rules! __export_main_impl {
     ($ty:ident) => {
         self::export!($ty with_types_in self);
     };
     ($ty:ident with_types_in $($path_to_types_root:tt)*) => {
-        $($path_to_types_root)*:: __export_world_discord_cabi!($ty with_types_in
+        $($path_to_types_root)*:: __export_world_main_cabi!($ty with_types_in
         $($path_to_types_root)*);
     };
 }
 #[doc(inline)]
-pub(crate) use __export_discord_impl as export;
+pub(crate) use __export_main_impl as export;
 #[cfg(target_arch = "wasm32")]
-#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:flow:discord@0.1.0:discord:encoded world")]
+#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:wassemble:discord@0.1.0:main:encoded world")]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 7009] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xe35\x01A\x02\x01A.\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 7008] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xe55\x01A\x02\x01A.\x01\
 ks\x01r\x03\x07contents\x0achannel-ids\x08guild-id\0\x03\0\x07message\x03\0\x01\x01\
 r\x03\x02ids\x05tokens\x03urls\x03\0\x07webhook\x03\0\x03\x01r\x04\x02ids\x08use\
 rnames\x0ddiscriminators\x06avatar\0\x03\0\x04user\x03\0\x05\x01r\x04\x02ids\x04\
@@ -9157,9 +9157,9 @@ sage-ids\x07contents\0\x7f\x04\0\x0cedit-message\x01\x1b\x01@\x02\x05tokens\x0ac
 hannel-ids\0\x08\x04\0\x0bget-channel\x01\x1c\x01@\x02\x05tokens\x07user-ids\0\x06\
 \x04\0\x08get-user\x01\x1d\x01@\x02\x05tokens\x07message\x02\0s\x04\0\x0csend-me\
 ssage\x01\x1e\x01@\x03\x05tokens\x07webhook\x04\x07contents\0s\x04\0\x14send-web\
-hook-message\x01\x1f\x04\0\x1aflow:discord/discord@0.1.0\x04\0\x0b\x0d\x01\0\x07\
-discord\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.22\
-7.1\x10wit-bindgen-rust\x060.41.0";
+hook-message\x01\x1f\x04\0\x1cwassemble:discord/main@0.1.0\x04\0\x0b\x0a\x01\0\x04\
+main\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\
+\x10wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

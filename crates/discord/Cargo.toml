@@ -20,7 +20,6 @@ package = "wassemble:discord"
 
 [package.metadata.component.dependencies]
 
-
 [package.metadata.component.target.dependencies]
 "wasi:cli" = { path = "./wit/deps/wasi-cli-0.2.5" }
 "wasi:clocks" = { path = "./wit/deps/wasi-clocks-0.2.5" }
