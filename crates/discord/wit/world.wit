@@ -1,0 +1,40 @@
+package wassemble:discord@0.1.0;
+
+world discord {
+    import wasi:http/outgoing-handler@0.2.5;
+
+    record message {
+        content: string,
+        channel-id: string,
+        guild-id: option<string>,
+    }
+
+    record webhook {
+        id: string,
+        token: string,
+        url: string,
+    }
+
+    record user {
+        id: string,
+        username: string,
+        discriminator: string,
+        avatar: option<string>,
+    }
+
+    record channel {
+        id: string,
+        name: string,
+        ty: u32,
+        guild-id: option<string>,
+    }
+
+    export create-webhook: func(token: string, channel-id: string, name: string) -> webhook;
+    export delete-webhook: func(token: string, webhook-id: string, webhook-token: string) -> bool;
+    export delete-message: func(token: string, channel-id: string, message-id: string) -> bool;
+    export edit-message: func(token: string, channel-id: string, message-id: string, content: string) -> bool;
+    export get-channel: func(token: string, channel-id: string) -> channel;
+    export get-user: func(token: string, user-id: string) -> user;
+    export send-message: func(token: string, message: message) -> string;
+    export send-webhook-message: func(token: string, webhook: webhook, content: string) -> string;
+}

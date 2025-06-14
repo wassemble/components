@@ -1,0 +1,67 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+
+      - name: Discover changed crates
+        id: set-matrix
+        run: |
+          # Get all workspace members
+          crates=$(cargo metadata --format-version=1 | jq -r '.workspace_members[]' | cut -d'#' -f1 | rev | cut -d'/' -f1 | rev)
+          
+          changed_crates=()
+          for crate in $crates; do
+            # Get crate path from metadata
+            crate_path=$(cargo metadata --format-version=1 | jq -r ".packages[] | select(.name == \"$crate\") | .manifest_path" | xargs dirname)
+            
+            # Check if any files in this crate changed
+            if echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -q "$crate_path"; then
+              changed_crates+=("$crate")
+            fi
+          done
+          
+          # Convert to JSON matrix
+          if [ ${#changed_crates[@]} -eq 0 ]; then
+            echo "matrix={\"component\":[]}" >> $GITHUB_OUTPUT
+          else
+            matrix=$(printf '%s\n' "${changed_crates[@]}" | jq -R . | jq -s .)
+            echo "matrix={\"component\":$matrix}" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-publish:
+    needs: detect-changes
+    if: ${{ fromJson(needs.detect-changes.outputs.matrix).component != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: ${{ fromJson(needs.detect-changes.outputs.matrix).component }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo install --locked wkg
+      
+      # Build
+      - run: cargo component build -p {{component}} --release
+
+      # Publish
+      - run: wkg oci push ghcr.io/wassemble/{{component}}:latest target/wasm32-wasip1/release/$(echo {{component}} | tr '-' '_').wasm
