@@ -9,6 +9,8 @@ use crate::bindings::{ChatCompletion, ChatResponse, Embedding, EmbeddingResponse
 
 const OPENAI_API_BASE: &str = "https://api.openai.com/v1";
 
+// TODO: remove unwrap
+
 #[derive(Deserialize, Serialize)]
 struct OpenAIChatResponse {
     id: String,
