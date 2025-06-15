@@ -14,10 +14,3 @@ crate-type = ["cdylib"]
 
 [package.metadata.component]
 package = "wassemble:discord"
-
-[package.metadata.component.target.dependencies]
-"wasi:cli" = { path = "./wit/deps/wasi-cli-0.2.5" }
-"wasi:clocks" = { path = "./wit/deps/wasi-clocks-0.2.5" }
-"wasi:http" = { path = "./wit/deps/wasi-http-0.2.5" }
-"wasi:io" = { path = "./wit/deps/wasi-io-0.2.5" }
-"wasi:random" = { path = "./wit/deps/wasi-random-0.2.5" }

@@ -30,6 +30,8 @@ jobs:
     needs: detect-changes
     if: ${{ fromJson(needs.detect-changes.outputs.matrix).component != '[]' }}
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     strategy:
       matrix:
         component: ${{ fromJson(needs.detect-changes.outputs.matrix).component }}
@@ -53,11 +55,3 @@ jobs:
       # Publish
       - run: |
           cargo component publish -p ${{ matrix.component }} --config config.toml
-
-      # Make package public
-      - run: |
-          curl -X PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/orgs/wassemble/packages/container/${{ matrix.component }}/visibility \
-            -d '{"visibility":"public"}'
