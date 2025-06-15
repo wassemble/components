@@ -11,7 +11,3 @@ crate-type = ["cdylib"]
 
 [package.metadata.component]
 package = "wassemble:hello-world"
-
-[package.metadata.component.target]
-path = "wit/world.wit"
-world = "main"
