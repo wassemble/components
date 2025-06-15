@@ -1,0 +1,36 @@
+package wassemble:openai@0.1.0;
+
+world openai {
+    record chat-message {
+        role: string,
+        content: string,
+    }
+
+    record chat-completion {
+        id: string,
+        model: string,
+        messages: list<chat-message>,
+        temperature: option<f64>,
+        max-tokens: option<u32>,
+    }
+
+    record chat-response {
+        id: string,
+        model: string,
+        content: string,
+        finish-reason: string,
+    }
+
+    record embedding {
+        model: string,
+        input: string,
+    }
+
+    record embedding-response {
+        model: string,
+        embedding: list<f64>,
+    }
+
+    export create-chat-completion: func(api-key: string, completion: chat-completion) -> chat-response;
+    export create-embedding: func(api-key: string, embedding: embedding) -> embedding-response;
+}

@@ -1,6 +1,6 @@
 package wassemble:discord@0.1.0;
 
-world main {
+world discord {
     import wasi:http/outgoing-handler@0.2.5;
 
     record message {

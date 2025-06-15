@@ -70,6 +70,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "github"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "waki",
+ "wit-bindgen-rt 0.42.1",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -154,6 +164,16 @@ name = "once_cell"
 version = "1.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
+
+[[package]]
+name = "openai"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "waki",
+ "wit-bindgen-rt 0.42.1",
+]
 
 [[package]]
 name = "percent-encoding"

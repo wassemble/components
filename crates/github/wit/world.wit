@@ -1,0 +1,31 @@
+package wassemble:github@0.1.0;
+
+interface types {
+    record issue {
+        body: string,
+        number: u32,
+        title: string,
+    }
+
+    record repository {
+        name: string,
+        owner: string,
+        description: string,
+    }
+
+    record user {
+        login: string,
+        id: u64,
+        avatar-url: string,
+    }
+}
+
+world github {
+    use types.{issue, repository, user};
+    
+    export create-issue: func(token: string, owner: string, repo: string, title: string, body: string) -> issue;
+    export create-repository: func(token: string, name: string, description: string) -> repository;
+    export delete-repository: func(token: string, owner: string, repo: string) -> bool;
+    export get-user: func(token: string) -> user;
+    export update-issue: func(token: string, owner: string, repo: string, number: u32, title: string, body: string) -> issue;
+}
