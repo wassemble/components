@@ -189,3 +189,19 @@ impl Guest for Component {
 }
 
 bindings::export!(Component with_types_in bindings);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_github_issue_struct() {
+        let issue = GitHubIssue {
+            body: "body".to_string(),
+            number: 1,
+            title: "title".to_string(),
+        };
+        assert_eq!(issue.body, "body");
+        assert_eq!(issue.number, 1);
+        assert_eq!(issue.title, "title");
+    }
+}
