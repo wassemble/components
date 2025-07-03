@@ -263,3 +263,21 @@ impl Guest for Component {
 }
 
 bindings::export!(Component with_types_in bindings);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_discord_channel_struct() {
+        let channel = Channel {
+            id: "1".to_string(),
+            name: "general".to_string(),
+            ty: 0,
+            guild_id: Some("guild1".to_string()),
+        };
+        assert_eq!(channel.id, "1");
+        assert_eq!(channel.name, "general");
+        assert_eq!(channel.ty, 0);
+        assert_eq!(channel.guild_id, Some("guild1".to_string()));
+    }
+}

@@ -597,24 +597,24 @@ macro_rules! __export_github_impl {
 #[doc(inline)]
 pub(crate) use __export_github_impl as export;
 #[cfg(target_arch = "wasm32")]
-#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:wassemble:github:github:encoded world")]
+#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:wassemble:github@0.1.0:github:encoded world")]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 619] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xee\x03\x01A\x02\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 631] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xfa\x03\x01A\x02\x01\
 A\x12\x01B\x06\x01r\x03\x04bodys\x06numbery\x05titles\x04\0\x05issue\x03\0\0\x01\
 r\x03\x04names\x05owners\x0bdescriptions\x04\0\x0arepository\x03\0\x02\x01r\x03\x05\
-logins\x02idw\x0aavatar-urls\x04\0\x04user\x03\0\x04\x03\0\x16wassemble:github/t\
-ypes\x05\0\x02\x03\0\0\x05issue\x03\0\x05issue\x03\0\x01\x02\x03\0\0\x0areposito\
-ry\x03\0\x0arepository\x03\0\x03\x02\x03\0\0\x04user\x03\0\x04user\x03\0\x05\x01\
-@\x05\x05tokens\x05owners\x04repos\x05titles\x04bodys\0\x02\x04\0\x0ccreate-issu\
-e\x01\x07\x01@\x03\x05tokens\x04names\x0bdescriptions\0\x04\x04\0\x11create-repo\
-sitory\x01\x08\x01@\x03\x05tokens\x05owners\x04repos\0\x7f\x04\0\x11delete-repos\
-itory\x01\x09\x01@\x01\x05tokens\0\x06\x04\0\x08get-user\x01\x0a\x01@\x06\x05tok\
-ens\x05owners\x04repos\x06numbery\x05titles\x04bodys\0\x02\x04\0\x0cupdate-issue\
-\x01\x0b\x04\0\x17wassemble:github/github\x04\0\x0b\x0c\x01\0\x06github\x03\0\0\0\
-G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindge\
-n-rust\x060.41.0";
+logins\x02idw\x0aavatar-urls\x04\0\x04user\x03\0\x04\x03\0\x1cwassemble:github/t\
+ypes@0.1.0\x05\0\x02\x03\0\0\x05issue\x03\0\x05issue\x03\0\x01\x02\x03\0\0\x0are\
+pository\x03\0\x0arepository\x03\0\x03\x02\x03\0\0\x04user\x03\0\x04user\x03\0\x05\
+\x01@\x05\x05tokens\x05owners\x04repos\x05titles\x04bodys\0\x02\x04\0\x0ccreate-\
+issue\x01\x07\x01@\x03\x05tokens\x04names\x0bdescriptions\0\x04\x04\0\x11create-\
+repository\x01\x08\x01@\x03\x05tokens\x05owners\x04repos\0\x7f\x04\0\x11delete-r\
+epository\x01\x09\x01@\x01\x05tokens\0\x06\x04\0\x08get-user\x01\x0a\x01@\x06\x05\
+tokens\x05owners\x04repos\x06numbery\x05titles\x04bodys\0\x02\x04\0\x0cupdate-is\
+sue\x01\x0b\x04\0\x1dwassemble:github/github@0.1.0\x04\0\x0b\x0c\x01\0\x06github\
+\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10\
+wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {
