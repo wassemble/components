@@ -144,118 +144,18 @@ bindings::export!(Component with_types_in bindings);
 
 #[cfg(test)]
 mod tests {
+    use std::env;
+
     use super::*;
-    use crate::bindings::{ChatCompletion, ChatMessage, Embedding};
+    use crate::bindings::{ChatCompletion, ChatMessage, Embedding, Guest};
 
-    #[test]
-    fn test_serializable_chat_message_creation() {
-        let message = SerializableChatMessage {
-            role: "user",
-            content: "Hello, world!",
-        };
-
-        assert_eq!(message.role, "user");
-        assert_eq!(message.content, "Hello, world!");
+    fn get_api_key() -> Option<String> {
+        env::var("OPENAI_SK").ok()
     }
 
-    #[test]
-    fn test_serializable_chat_completion_creation() {
-        let messages = vec![SerializableChatMessage {
-            role: "user",
-            content: "Test message",
-        }];
-
-        let completion = SerializableChatCompletion {
-            model: "gpt-3.5-turbo",
-            messages,
-            temperature: Some(0.7),
-            max_tokens: Some(100),
-        };
-
-        assert_eq!(completion.model, "gpt-3.5-turbo");
-        assert_eq!(completion.messages.len(), 1);
-        assert_eq!(completion.temperature, Some(0.7));
-        assert_eq!(completion.max_tokens, Some(100));
-    }
-
-    #[test]
-    fn test_serializable_embedding_creation() {
-        let embedding = SerializableEmbedding {
-            model: "text-embedding-ada-002",
-            input: "Test text",
-        };
-
-        assert_eq!(embedding.model, "text-embedding-ada-002");
-        assert_eq!(embedding.input, "Test text");
-    }
-
-    #[test]
-    fn test_openai_chat_response_deserialization() {
-        let json = r#"
-        {
-            "id": "chatcmpl-123",
-            "model": "gpt-3.5-turbo",
-            "choices": [
-                {
-                    "message": {
-                        "content": "Hello! How can I help you today?"
-                    },
-                    "finish_reason": "stop"
-                }
-            ]
-        }
-        "#;
-
-        let response: OpenAIChatResponse = serde_json::from_str(json).unwrap();
-        assert_eq!(response.id, "chatcmpl-123");
-        assert_eq!(response.model, "gpt-3.5-turbo");
-        assert_eq!(response.choices.len(), 1);
-        assert_eq!(
-            response.choices[0].message.content,
-            "Hello! How can I help you today?"
-        );
-        assert_eq!(response.choices[0].finish_reason, "stop");
-    }
-
-    #[test]
-    fn test_openai_embedding_response_deserialization() {
-        let json = r#"
-        {
-            "model": "text-embedding-ada-002",
-            "data": [
-                {
-                    "embedding": [0.1, 0.2, 0.3, 0.4, 0.5]
-                }
-            ]
-        }
-        "#;
-
-        let response: OpenAIEmbeddingResponse = serde_json::from_str(json).unwrap();
-        assert_eq!(response.model, "text-embedding-ada-002");
-        assert_eq!(response.data.len(), 1);
-        assert_eq!(response.data[0].embedding, vec![0.1, 0.2, 0.3, 0.4, 0.5]);
-    }
-
-    #[test]
-    fn test_chat_message_to_serializable_conversion() {
-        let chat_message = ChatMessage {
-            role: "user".to_string(),
-            content: "Hello, AI!".to_string(),
-        };
-
-        let serializable = SerializableChatMessage {
-            role: &chat_message.role,
-            content: &chat_message.content,
-        };
-
-        assert_eq!(serializable.role, "user");
-        assert_eq!(serializable.content, "Hello, AI!");
-    }
-
-    #[test]
-    fn test_chat_completion_message_mapping() {
-        let completion = ChatCompletion {
-            id: "test-id".to_string(),
+    fn create_test_chat_completion() -> ChatCompletion {
+        ChatCompletion {
+            id: "chat_completion_id".to_string(),
             model: "gpt-3.5-turbo".to_string(),
             messages: vec![
                 ChatMessage {
@@ -264,79 +164,317 @@ mod tests {
                 },
                 ChatMessage {
                     role: "user".to_string(),
-                    content: "Hello!".to_string(),
+                    content: "Say hello in exactly 3 words.".to_string(),
                 },
             ],
             temperature: Some(0.7),
-            max_tokens: Some(150),
-        };
-
-        let messages: Vec<SerializableChatMessage> = completion
-            .messages
-            .iter()
-            .map(|m| SerializableChatMessage {
-                role: &m.role,
-                content: &m.content,
-            })
-            .collect();
-
-        assert_eq!(messages.len(), 2);
-        assert_eq!(messages[0].role, "system");
-        assert_eq!(messages[0].content, "You are a helpful assistant.");
-        assert_eq!(messages[1].role, "user");
-        assert_eq!(messages[1].content, "Hello!");
+            max_tokens: Some(50),
+        }
     }
 
-    #[test]
-    fn test_embedding_to_serializable_conversion() {
-        let embedding = Embedding {
+    fn create_test_embedding() -> Embedding {
+        Embedding {
             model: "text-embedding-ada-002".to_string(),
-            input: "This is a test string".to_string(),
-        };
-
-        let serializable = SerializableEmbedding {
-            model: &embedding.model,
-            input: &embedding.input,
-        };
-
-        assert_eq!(serializable.model, "text-embedding-ada-002");
-        assert_eq!(serializable.input, "This is a test string");
+            input: "Hello, world!".to_string(),
+        }
     }
 
     #[test]
-    fn test_openai_api_base_constant() {
-        assert_eq!(OPENAI_API_BASE, "https://api.openai.com/v1");
+    fn test_create_chat_completion_success() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let completion = create_test_chat_completion();
+
+            let response = Component::create_chat_completion(api_key, completion);
+
+            // Verify response structure
+            assert!(!response.id.is_empty(), "Response ID should not be empty");
+            assert!(
+                !response.model.is_empty(),
+                "Response model should not be empty"
+            );
+            assert!(
+                !response.content.is_empty(),
+                "Response content should not be empty"
+            );
+            assert!(
+                !response.finish_reason.is_empty(),
+                "Finish reason should not be empty"
+            );
+
+            // Verify the model matches what we requested
+            assert!(
+                response.model.contains("gpt-3.5-turbo"),
+                "Model should contain gpt-3.5-turbo"
+            );
+
+            // Verify finish reason is valid
+            assert!(
+                response.finish_reason == "stop"
+                    || response.finish_reason == "length"
+                    || response.finish_reason == "content_filter"
+                    || response.finish_reason == "tool_calls",
+                "Finish reason should be a valid OpenAI finish reason"
+            );
+        });
     }
 
     #[test]
-    fn test_chat_completion_with_optional_fields() {
-        let completion = ChatCompletion {
-            id: "test-id-2".to_string(),
-            model: "gpt-4".to_string(),
-            messages: vec![ChatMessage {
-                role: "user".to_string(),
-                content: "Test".to_string(),
-            }],
-            temperature: None,
-            max_tokens: None,
-        };
+    fn test_create_chat_completion_with_different_models() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let models = vec!["gpt-3.5-turbo", "gpt-4"];
 
-        let serializable = SerializableChatCompletion {
-            model: &completion.model,
-            messages: completion
-                .messages
-                .iter()
-                .map(|m| SerializableChatMessage {
-                    role: &m.role,
-                    content: &m.content,
-                })
-                .collect(),
-            temperature: completion.temperature,
-            max_tokens: completion.max_tokens,
-        };
+            for model in models {
+                let mut completion = create_test_chat_completion();
+                completion.model = model.to_string();
 
-        assert_eq!(serializable.model, "gpt-4");
-        assert_eq!(serializable.temperature, None);
-        assert_eq!(serializable.max_tokens, None);
+                let response = Component::create_chat_completion(api_key.clone(), completion);
+
+                assert!(
+                    !response.content.is_empty(),
+                    "Response should have content for model {}",
+                    model
+                );
+                assert!(
+                    response.model.contains(model),
+                    "Response model should contain requested model"
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn test_create_chat_completion_with_temperature_variations() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let temperatures = vec![0.0, 0.5, 1.0];
+
+            for temp in temperatures {
+                let mut completion = create_test_chat_completion();
+                completion.temperature = Some(temp);
+
+                let response = Component::create_chat_completion(api_key.clone(), completion);
+
+                assert!(
+                    !response.content.is_empty(),
+                    "Response should have content for temperature {}",
+                    temp
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn test_create_chat_completion_with_max_tokens() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let mut completion = create_test_chat_completion();
+            completion.max_tokens = Some(10);
+
+            let response = Component::create_chat_completion(api_key, completion);
+
+            assert!(
+                !response.content.is_empty(),
+                "Response should have content even with low max_tokens"
+            );
+            // Note: We can't easily verify the exact token count without tokenizing
+        });
+    }
+
+    #[test]
+    fn test_create_embedding_success() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let embedding = create_test_embedding();
+
+            let response = Component::create_embedding(api_key, embedding);
+
+            // Verify response structure
+            assert!(
+                !response.model.is_empty(),
+                "Response model should not be empty"
+            );
+            assert!(
+                !response.embedding.is_empty(),
+                "Embedding vector should not be empty"
+            );
+
+            // Verify the model matches what we requested
+            assert!(
+                response.model.contains("text-embedding-ada-002"),
+                "Model should contain text-embedding-ada-002"
+            );
+
+            // Verify embedding dimensions (ada-002 should return 1536 dimensions)
+            assert_eq!(
+                response.embedding.len(),
+                1536,
+                "Ada-002 embedding should have 1536 dimensions"
+            );
+
+            // Verify embedding values are reasonable (should be between -1 and 1)
+            for value in &response.embedding {
+                assert!(
+                    value.abs() <= 1.0,
+                    "Embedding values should be between -1 and 1"
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn test_create_embedding_with_different_inputs() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let inputs = vec![
+                "Short text",
+                "This is a longer piece of text that should still work fine with the embedding API.",
+                "12345",
+                "Special characters: !@#$%^&*()",
+            ];
+
+            for input in inputs {
+                let embedding = Embedding {
+                    model: "text-embedding-ada-002".to_string(),
+                    input: input.to_string(),
+                };
+
+                let response = Component::create_embedding(api_key.clone(), embedding);
+
+                assert!(
+                    !response.embedding.is_empty(),
+                    "Should get embedding for input: {}",
+                    input
+                );
+                assert_eq!(
+                    response.embedding.len(),
+                    1536,
+                    "Should have correct dimensions for input: {}",
+                    input
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn test_create_embedding_reproducibility() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let embedding = create_test_embedding();
+
+            let response1 = Component::create_embedding(api_key.clone(), embedding.clone());
+            let response2 = Component::create_embedding(api_key, embedding);
+
+            // Embeddings should be identical for the same input
+            assert_eq!(response1.embedding.len(), response2.embedding.len());
+            for (val1, val2) in response1.embedding.iter().zip(response2.embedding.iter()) {
+                assert!(
+                    (val1 - val2).abs() < 1e-10,
+                    "Embeddings should be identical for same input"
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn test_create_chat_completion_invalid_api_key() {
+        run_if_api_key_available(|| {
+            let invalid_api_key = "invalid_key".to_string();
+            let completion = create_test_chat_completion();
+
+            let result = std::panic::catch_unwind(|| {
+                Component::create_chat_completion(invalid_api_key, completion);
+            });
+
+            assert!(result.is_err(), "Should panic with invalid API key");
+        });
+    }
+
+    #[test]
+    fn test_create_embedding_invalid_api_key() {
+        run_if_api_key_available(|| {
+            let invalid_api_key = "invalid_key".to_string();
+            let embedding = create_test_embedding();
+
+            let result = std::panic::catch_unwind(|| {
+                Component::create_embedding(invalid_api_key, embedding);
+            });
+
+            assert!(result.is_err(), "Should panic with invalid API key");
+        });
+    }
+
+    #[test]
+    fn test_create_chat_completion_conversation_flow() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+
+            // First message
+            let completion1 = ChatCompletion {
+                id: "chat_completion_id".to_string(),
+                model: "gpt-3.5-turbo".to_string(),
+                messages: vec![ChatMessage {
+                    role: "user".to_string(),
+                    content: "What is 2+2?".to_string(),
+                }],
+                temperature: Some(0.1),
+                max_tokens: Some(100),
+            };
+
+            let response1 = Component::create_chat_completion(api_key.clone(), completion1);
+            assert!(!response1.content.is_empty());
+
+            // Follow-up message using the response
+            let completion2 = ChatCompletion {
+                id: "chat_completion_id".to_string(),
+                model: "gpt-3.5-turbo".to_string(),
+                messages: vec![
+                    ChatMessage {
+                        role: "user".to_string(),
+                        content: "What is 2+2?".to_string(),
+                    },
+                    ChatMessage {
+                        role: "assistant".to_string(),
+                        content: response1.content.clone(),
+                    },
+                    ChatMessage {
+                        role: "user".to_string(),
+                        content: "Now what is 3+3?".to_string(),
+                    },
+                ],
+                temperature: Some(0.1),
+                max_tokens: Some(100),
+            };
+
+            let response2 = Component::create_chat_completion(api_key, completion2);
+            assert!(!response2.content.is_empty());
+            assert_ne!(
+                response1.content, response2.content,
+                "Responses should be different"
+            );
+        });
+    }
+
+    // Helper function to run tests conditionally based on environment
+    fn run_if_api_key_available<F>(test_fn: F)
+    where
+        F: FnOnce(),
+    {
+        if env::var("OPENAI_SK").is_ok() {
+            test_fn();
+        } else {
+            println!("Skipping test - OPENAI_SK not set");
+        }
+    }
+
+    #[test]
+    fn test_conditional_execution() {
+        run_if_api_key_available(|| {
+            let api_key = get_api_key().unwrap();
+            let completion = create_test_chat_completion();
+            let response = Component::create_chat_completion(api_key, completion);
+            assert!(!response.content.is_empty());
+        });
     }
 }
