@@ -42,8 +42,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
-      - run: cargo install --locked cargo-component
-      - run: cargo install --locked wit-bindgen-cli
+      - uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: cargo-component,wit-bindgen-cli
 
       # Configure registry
       - run: |
