@@ -30,8 +30,8 @@ done
 echo "Found changed crates: ${changed_crates[*]}"
 
 if [ ${#changed_crates[@]} -eq 0 ]; then
-  echo "matrix={\"component\":[]}" >> "$GITHUB_OUTPUT"
+  echo "matrix=[]" >> "$GITHUB_OUTPUT"
 else
   json_array=$(printf '"%s",' "${changed_crates[@]}" | sed 's/,$//')
-  echo "matrix={\"component\":[$json_array]}" >> "$GITHUB_OUTPUT"
+  echo "matrix=[$json_array]" >> "$GITHUB_OUTPUT"
 fi 

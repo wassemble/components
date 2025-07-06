@@ -29,7 +29,7 @@ jobs:
 
   publish:
     needs: detect-changes
-    if: ${{ fromJson(needs.detect-changes.outputs.matrix).component != '[]' }}
+    if: ${{ needs.detect-changes.outputs.matrix != '[]' }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
