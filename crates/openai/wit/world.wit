@@ -1,36 +1,82 @@
 package wassemble:openai@0.1.0;
 
+/// OpenAI API integration world for chat completions and embeddings
 world openai {
+    /// Represents a single message in a chat conversation
+    /// Used for both user input and assistant responses
     record chat-message {
+        /// The role of the message sender: "user", "assistant", or "system"
         role: string,
+        /// The content/body of the message
         content: string,
     }
 
+    /// Configuration for a chat completion request to OpenAI
+    /// Contains the conversation history and generation parameters
     record chat-completion {
+        /// Unique identifier for this completion request
         id: string,
+        /// The OpenAI model to use (e.g., "gpt-3.5-turbo", "gpt-4")
         model: string,
+        /// List of messages in the conversation history
         messages: list<chat-message>,
+        /// Controls randomness in the response (0.0 = deterministic, 2.0 = very random)
+        /// Optional parameter - if not provided, uses model default
         temperature: option<f64>,
+        /// Maximum number of tokens to generate in the response
+        /// Optional parameter - if not provided, uses model default
         max-tokens: option<u32>,
     }
 
+    /// Response from OpenAI's chat completion API
+    /// Contains the generated text and metadata about the completion
     record chat-response {
+        /// Unique identifier for this completion response
         id: string,
+        /// The model that was used to generate the response
         model: string,
+        /// The generated text content from the assistant
         content: string,
+        /// Reason why the generation stopped: "stop", "length", "content_filter", etc.
         finish-reason: string,
     }
 
+    /// Configuration for an embedding request to OpenAI
+    /// Used to convert text into numerical vector representations
     record embedding {
+        /// The OpenAI embedding model to use (e.g., "text-embedding-ada-002")
         model: string,
+        /// The text input to convert into an embedding vector
         input: string,
     }
 
+    /// Response from OpenAI's embedding API
+    /// Contains the numerical vector representation of the input text
     record embedding-response {
+        /// The model that was used to generate the embedding
         model: string,
+        /// The numerical vector representation of the input text
+        /// Each number represents a dimension in the embedding space
         embedding: list<f64>,
     }
 
+    /// Creates a chat completion using OpenAI's API
+    /// Sends a conversation to OpenAI and returns the assistant's response
+    /// 
+    /// Parameters:
+    /// - api-key: Your OpenAI API key for authentication
+    /// - completion: The chat completion configuration and conversation
+    /// 
+    /// Returns: The generated response from the assistant
     export create-chat-completion: func(api-key: string, completion: chat-completion) -> chat-response;
+
+    /// Creates an embedding vector using OpenAI's API
+    /// Converts text into a numerical representation for semantic analysis
+    /// 
+    /// Parameters:
+    /// - api-key: Your OpenAI API key for authentication
+    /// - embedding: The embedding configuration and input text
+    /// 
+    /// Returns: The numerical vector representation of the input text
     export create-embedding: func(api-key: string, embedding: embedding) -> embedding-response;
 }
