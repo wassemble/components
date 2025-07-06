@@ -44,7 +44,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
-          tool: cargo-component,wit-bindgen-cli
+          tool: cargo-component
+      - uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: wit-bindgen-cli
 
       # Configure registry
       - run: |
