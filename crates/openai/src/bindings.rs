@@ -104,6 +104,50 @@ impl ::core::fmt::Debug for EmbeddingResponse {
             .finish()
     }
 }
+/// Error types that can occur during OpenAI API operations
+#[derive(Clone)]
+pub enum OpenaiError {
+    /// Failed to send HTTP request
+    RequestFailed(_rt::String),
+    /// Failed to get response body
+    ResponseBodyError(_rt::String),
+    /// Failed to parse response as UTF-8
+    Utf8Error(_rt::String),
+    /// Failed to parse JSON response
+    JsonParseError(_rt::String),
+    /// No choices in response
+    NoChoices,
+    /// No embedding data in response
+    NoEmbeddingData,
+}
+impl ::core::fmt::Debug for OpenaiError {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        match self {
+            OpenaiError::RequestFailed(e) => {
+                f.debug_tuple("OpenaiError::RequestFailed").field(e).finish()
+            }
+            OpenaiError::ResponseBodyError(e) => {
+                f.debug_tuple("OpenaiError::ResponseBodyError").field(e).finish()
+            }
+            OpenaiError::Utf8Error(e) => {
+                f.debug_tuple("OpenaiError::Utf8Error").field(e).finish()
+            }
+            OpenaiError::JsonParseError(e) => {
+                f.debug_tuple("OpenaiError::JsonParseError").field(e).finish()
+            }
+            OpenaiError::NoChoices => f.debug_tuple("OpenaiError::NoChoices").finish(),
+            OpenaiError::NoEmbeddingData => {
+                f.debug_tuple("OpenaiError::NoEmbeddingData").finish()
+            }
+        }
+    }
+}
+impl ::core::fmt::Display for OpenaiError {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+impl std::error::Error for OpenaiError {}
 #[doc(hidden)]
 #[allow(non_snake_case)]
 pub unsafe fn _export_create_chat_completion_cabi<T: Guest>(
@@ -120,8 +164,7 @@ pub unsafe fn _export_create_chat_completion_cabi<T: Guest>(
     arg10: i32,
     arg11: i32,
 ) -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -135,17 +178,13 @@ pub unsafe fn _export_create_chat_completion_cabi<T: Guest>(
         let base = base9.add(i * (4 * ::core::mem::size_of::<*const u8>()));
         let e9 = {
             let l3 = *base.add(0).cast::<*mut u8>();
-            let l4 = *base
-                .add(::core::mem::size_of::<*const u8>())
-                .cast::<usize>();
+            let l4 = *base.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
             let len5 = l4;
             let bytes5 = _rt::Vec::from_raw_parts(l3.cast(), len5, len5);
             let l6 = *base
                 .add(2 * ::core::mem::size_of::<*const u8>())
                 .cast::<*mut u8>();
-            let l7 = *base
-                .add(3 * ::core::mem::size_of::<*const u8>())
-                .cast::<usize>();
+            let l7 = *base.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
             let len8 = l7;
             let bytes8 = _rt::Vec::from_raw_parts(l6.cast(), len8, len8);
             ChatMessage {
@@ -185,81 +224,187 @@ pub unsafe fn _export_create_chat_completion_cabi<T: Guest>(
         },
     );
     let ptr11 = (&raw mut _RET_AREA.0).cast::<u8>();
-    let ChatResponse {
-        id: id12,
-        model: model12,
-        content: content12,
-        finish_reason: finish_reason12,
-    } = result10;
-    let vec13 = (id12.into_bytes()).into_boxed_slice();
-    let ptr13 = vec13.as_ptr().cast::<u8>();
-    let len13 = vec13.len();
-    ::core::mem::forget(vec13);
-    *ptr11
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len13;
-    *ptr11.add(0).cast::<*mut u8>() = ptr13.cast_mut();
-    let vec14 = (model12.into_bytes()).into_boxed_slice();
-    let ptr14 = vec14.as_ptr().cast::<u8>();
-    let len14 = vec14.len();
-    ::core::mem::forget(vec14);
-    *ptr11
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len14;
-    *ptr11
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr14.cast_mut();
-    let vec15 = (content12.into_bytes()).into_boxed_slice();
-    let ptr15 = vec15.as_ptr().cast::<u8>();
-    let len15 = vec15.len();
-    ::core::mem::forget(vec15);
-    *ptr11
-        .add(5 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len15;
-    *ptr11
-        .add(4 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr15.cast_mut();
-    let vec16 = (finish_reason12.into_bytes()).into_boxed_slice();
-    let ptr16 = vec16.as_ptr().cast::<u8>();
-    let len16 = vec16.len();
-    ::core::mem::forget(vec16);
-    *ptr11
-        .add(7 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len16;
-    *ptr11
-        .add(6 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr16.cast_mut();
+    match result10 {
+        Ok(e) => {
+            *ptr11.add(0).cast::<u8>() = (0i32) as u8;
+            let ChatResponse {
+                id: id12,
+                model: model12,
+                content: content12,
+                finish_reason: finish_reason12,
+            } = e;
+            let vec13 = (id12.into_bytes()).into_boxed_slice();
+            let ptr13 = vec13.as_ptr().cast::<u8>();
+            let len13 = vec13.len();
+            ::core::mem::forget(vec13);
+            *ptr11.add(2 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len13;
+            *ptr11.add(::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr13
+                .cast_mut();
+            let vec14 = (model12.into_bytes()).into_boxed_slice();
+            let ptr14 = vec14.as_ptr().cast::<u8>();
+            let len14 = vec14.len();
+            ::core::mem::forget(vec14);
+            *ptr11.add(4 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len14;
+            *ptr11.add(3 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr14
+                .cast_mut();
+            let vec15 = (content12.into_bytes()).into_boxed_slice();
+            let ptr15 = vec15.as_ptr().cast::<u8>();
+            let len15 = vec15.len();
+            ::core::mem::forget(vec15);
+            *ptr11.add(6 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len15;
+            *ptr11.add(5 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr15
+                .cast_mut();
+            let vec16 = (finish_reason12.into_bytes()).into_boxed_slice();
+            let ptr16 = vec16.as_ptr().cast::<u8>();
+            let len16 = vec16.len();
+            ::core::mem::forget(vec16);
+            *ptr11.add(8 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len16;
+            *ptr11.add(7 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr16
+                .cast_mut();
+        }
+        Err(e) => {
+            *ptr11.add(0).cast::<u8>() = (1i32) as u8;
+            match e {
+                OpenaiError::RequestFailed(e) => {
+                    *ptr11.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (0i32)
+                        as u8;
+                    let vec17 = (e.into_bytes()).into_boxed_slice();
+                    let ptr17 = vec17.as_ptr().cast::<u8>();
+                    let len17 = vec17.len();
+                    ::core::mem::forget(vec17);
+                    *ptr11
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>() = len17;
+                    *ptr11
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr17.cast_mut();
+                }
+                OpenaiError::ResponseBodyError(e) => {
+                    *ptr11.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (1i32)
+                        as u8;
+                    let vec18 = (e.into_bytes()).into_boxed_slice();
+                    let ptr18 = vec18.as_ptr().cast::<u8>();
+                    let len18 = vec18.len();
+                    ::core::mem::forget(vec18);
+                    *ptr11
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>() = len18;
+                    *ptr11
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr18.cast_mut();
+                }
+                OpenaiError::Utf8Error(e) => {
+                    *ptr11.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (2i32)
+                        as u8;
+                    let vec19 = (e.into_bytes()).into_boxed_slice();
+                    let ptr19 = vec19.as_ptr().cast::<u8>();
+                    let len19 = vec19.len();
+                    ::core::mem::forget(vec19);
+                    *ptr11
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>() = len19;
+                    *ptr11
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr19.cast_mut();
+                }
+                OpenaiError::JsonParseError(e) => {
+                    *ptr11.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (3i32)
+                        as u8;
+                    let vec20 = (e.into_bytes()).into_boxed_slice();
+                    let ptr20 = vec20.as_ptr().cast::<u8>();
+                    let len20 = vec20.len();
+                    ::core::mem::forget(vec20);
+                    *ptr11
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>() = len20;
+                    *ptr11
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr20.cast_mut();
+                }
+                OpenaiError::NoChoices => {
+                    *ptr11.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (4i32)
+                        as u8;
+                }
+                OpenaiError::NoEmbeddingData => {
+                    *ptr11.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (5i32)
+                        as u8;
+                }
+            }
+        }
+    };
     ptr11
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_create_chat_completion<T: Guest>(arg0: *mut u8) {
-    let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
-    _rt::cabi_dealloc(l0, l1, 1);
-    let l2 = *arg0
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l3 = *arg0
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
-    _rt::cabi_dealloc(l2, l3, 1);
-    let l4 = *arg0
-        .add(4 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l5 = *arg0
-        .add(5 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
-    _rt::cabi_dealloc(l4, l5, 1);
-    let l6 = *arg0
-        .add(6 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l7 = *arg0
-        .add(7 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
-    _rt::cabi_dealloc(l6, l7, 1);
+    let l0 = i32::from(*arg0.add(0).cast::<u8>());
+    match l0 {
+        0 => {
+            let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<*mut u8>();
+            let l2 = *arg0.add(2 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
+            _rt::cabi_dealloc(l1, l2, 1);
+            let l3 = *arg0
+                .add(3 * ::core::mem::size_of::<*const u8>())
+                .cast::<*mut u8>();
+            let l4 = *arg0.add(4 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
+            _rt::cabi_dealloc(l3, l4, 1);
+            let l5 = *arg0
+                .add(5 * ::core::mem::size_of::<*const u8>())
+                .cast::<*mut u8>();
+            let l6 = *arg0.add(6 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
+            _rt::cabi_dealloc(l5, l6, 1);
+            let l7 = *arg0
+                .add(7 * ::core::mem::size_of::<*const u8>())
+                .cast::<*mut u8>();
+            let l8 = *arg0.add(8 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
+            _rt::cabi_dealloc(l7, l8, 1);
+        }
+        _ => {
+            let l9 = i32::from(
+                *arg0.add(::core::mem::size_of::<*const u8>()).cast::<u8>(),
+            );
+            match l9 {
+                0 => {
+                    let l10 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l11 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l10, l11, 1);
+                }
+                1 => {
+                    let l12 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l13 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l12, l13, 1);
+                }
+                2 => {
+                    let l14 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l15 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l14, l15, 1);
+                }
+                3 => {
+                    let l16 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l17 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l16, l17, 1);
+                }
+                4 => {}
+                _ => {}
+            }
+        }
+    }
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
@@ -271,8 +416,7 @@ pub unsafe fn _export_create_embedding_cabi<T: Guest>(
     arg4: *mut u8,
     arg5: usize,
 ) -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -287,47 +431,152 @@ pub unsafe fn _export_create_embedding_cabi<T: Guest>(
         },
     );
     let ptr4 = (&raw mut _RET_AREA.0).cast::<u8>();
-    let EmbeddingResponse {
-        model: model5,
-        embedding: embedding5,
-    } = result3;
-    let vec6 = (model5.into_bytes()).into_boxed_slice();
-    let ptr6 = vec6.as_ptr().cast::<u8>();
-    let len6 = vec6.len();
-    ::core::mem::forget(vec6);
-    *ptr4
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len6;
-    *ptr4.add(0).cast::<*mut u8>() = ptr6.cast_mut();
-    let vec7 = (embedding5).into_boxed_slice();
-    let ptr7 = vec7.as_ptr().cast::<u8>();
-    let len7 = vec7.len();
-    ::core::mem::forget(vec7);
-    *ptr4
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len7;
-    *ptr4
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr7.cast_mut();
+    match result3 {
+        Ok(e) => {
+            *ptr4.add(0).cast::<u8>() = (0i32) as u8;
+            let EmbeddingResponse { model: model5, embedding: embedding5 } = e;
+            let vec6 = (model5.into_bytes()).into_boxed_slice();
+            let ptr6 = vec6.as_ptr().cast::<u8>();
+            let len6 = vec6.len();
+            ::core::mem::forget(vec6);
+            *ptr4.add(2 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len6;
+            *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr6
+                .cast_mut();
+            let vec7 = (embedding5).into_boxed_slice();
+            let ptr7 = vec7.as_ptr().cast::<u8>();
+            let len7 = vec7.len();
+            ::core::mem::forget(vec7);
+            *ptr4.add(4 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len7;
+            *ptr4.add(3 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr7
+                .cast_mut();
+        }
+        Err(e) => {
+            *ptr4.add(0).cast::<u8>() = (1i32) as u8;
+            match e {
+                OpenaiError::RequestFailed(e) => {
+                    *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (0i32)
+                        as u8;
+                    let vec8 = (e.into_bytes()).into_boxed_slice();
+                    let ptr8 = vec8.as_ptr().cast::<u8>();
+                    let len8 = vec8.len();
+                    ::core::mem::forget(vec8);
+                    *ptr4.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len8;
+                    *ptr4
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr8.cast_mut();
+                }
+                OpenaiError::ResponseBodyError(e) => {
+                    *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (1i32)
+                        as u8;
+                    let vec9 = (e.into_bytes()).into_boxed_slice();
+                    let ptr9 = vec9.as_ptr().cast::<u8>();
+                    let len9 = vec9.len();
+                    ::core::mem::forget(vec9);
+                    *ptr4.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len9;
+                    *ptr4
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr9.cast_mut();
+                }
+                OpenaiError::Utf8Error(e) => {
+                    *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (2i32)
+                        as u8;
+                    let vec10 = (e.into_bytes()).into_boxed_slice();
+                    let ptr10 = vec10.as_ptr().cast::<u8>();
+                    let len10 = vec10.len();
+                    ::core::mem::forget(vec10);
+                    *ptr4.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len10;
+                    *ptr4
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr10.cast_mut();
+                }
+                OpenaiError::JsonParseError(e) => {
+                    *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (3i32)
+                        as u8;
+                    let vec11 = (e.into_bytes()).into_boxed_slice();
+                    let ptr11 = vec11.as_ptr().cast::<u8>();
+                    let len11 = vec11.len();
+                    ::core::mem::forget(vec11);
+                    *ptr4.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len11;
+                    *ptr4
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>() = ptr11.cast_mut();
+                }
+                OpenaiError::NoChoices => {
+                    *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (4i32)
+                        as u8;
+                }
+                OpenaiError::NoEmbeddingData => {
+                    *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<u8>() = (5i32)
+                        as u8;
+                }
+            }
+        }
+    };
     ptr4
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_create_embedding<T: Guest>(arg0: *mut u8) {
-    let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
-    _rt::cabi_dealloc(l0, l1, 1);
-    let l2 = *arg0
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l3 = *arg0
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
-    let base4 = l2;
-    let len4 = l3;
-    _rt::cabi_dealloc(base4, len4 * 8, 8);
+    let l0 = i32::from(*arg0.add(0).cast::<u8>());
+    match l0 {
+        0 => {
+            let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<*mut u8>();
+            let l2 = *arg0.add(2 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
+            _rt::cabi_dealloc(l1, l2, 1);
+            let l3 = *arg0
+                .add(3 * ::core::mem::size_of::<*const u8>())
+                .cast::<*mut u8>();
+            let l4 = *arg0.add(4 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
+            let base5 = l3;
+            let len5 = l4;
+            _rt::cabi_dealloc(base5, len5 * 8, 8);
+        }
+        _ => {
+            let l6 = i32::from(
+                *arg0.add(::core::mem::size_of::<*const u8>()).cast::<u8>(),
+            );
+            match l6 {
+                0 => {
+                    let l7 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l8 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l7, l8, 1);
+                }
+                1 => {
+                    let l9 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l10 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l9, l10, 1);
+                }
+                2 => {
+                    let l11 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l12 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l11, l12, 1);
+                }
+                3 => {
+                    let l13 = *arg0
+                        .add(2 * ::core::mem::size_of::<*const u8>())
+                        .cast::<*mut u8>();
+                    let l14 = *arg0
+                        .add(3 * ::core::mem::size_of::<*const u8>())
+                        .cast::<usize>();
+                    _rt::cabi_dealloc(l13, l14, 1);
+                }
+                4 => {}
+                _ => {}
+            }
+        }
+    }
 }
 pub trait Guest {
     /// Creates a chat completion using OpenAI's API
@@ -337,8 +586,11 @@ pub trait Guest {
     /// - api-key: Your OpenAI API key for authentication
     /// - completion: The chat completion configuration and conversation
     ///
-    /// Returns: The generated response from the assistant
-    fn create_chat_completion(api_key: _rt::String, completion: ChatCompletion) -> ChatResponse;
+    /// Returns: The generated response from the assistant or an error
+    fn create_chat_completion(
+        api_key: _rt::String,
+        completion: ChatCompletion,
+    ) -> Result<ChatResponse, OpenaiError>;
     /// Creates an embedding vector using OpenAI's API
     /// Converts text into a numerical representation for semantic analysis
     ///
@@ -346,8 +598,11 @@ pub trait Guest {
     /// - api-key: Your OpenAI API key for authentication
     /// - embedding: The embedding configuration and input text
     ///
-    /// Returns: The numerical vector representation of the input text
-    fn create_embedding(api_key: _rt::String, embedding: Embedding) -> EmbeddingResponse;
+    /// Returns: The numerical vector representation of the input text or an error
+    fn create_embedding(
+        api_key: _rt::String,
+        embedding: Embedding,
+    ) -> Result<EmbeddingResponse, OpenaiError>;
 }
 #[doc(hidden)]
 macro_rules! __export_world_openai_cabi {
@@ -374,9 +629,10 @@ macro_rules! __export_world_openai_cabi {
 pub(crate) use __export_world_openai_cabi;
 #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
 #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
-struct _RetArea([::core::mem::MaybeUninit<u8>; 8 * ::core::mem::size_of::<*const u8>()]);
-static mut _RET_AREA: _RetArea =
-    _RetArea([::core::mem::MaybeUninit::uninit(); 8 * ::core::mem::size_of::<*const u8>()]);
+struct _RetArea([::core::mem::MaybeUninit<u8>; 9 * ::core::mem::size_of::<*const u8>()]);
+static mut _RET_AREA: _RetArea = _RetArea(
+    [::core::mem::MaybeUninit::uninit(); 9 * ::core::mem::size_of::<*const u8>()],
+);
 #[rustfmt::skip]
 mod _rt {
     #![allow(dead_code, clippy::all)]
@@ -440,21 +696,26 @@ macro_rules! __export_openai_impl {
 #[doc(inline)]
 pub(crate) use __export_openai_impl as export;
 #[cfg(target_arch = "wasm32")]
-#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:wassemble:openai@0.1.0:openai:encoded world")]
+#[unsafe(
+    link_section = "component-type:wit-bindgen:0.41.0:wassemble:openai@0.1.0:openai:encoded world"
+)]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 516] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x87\x03\x01A\x02\x01\
-A\x12\x01r\x02\x04roles\x07contents\x03\0\x0cchat-message\x03\0\0\x01p\x01\x01ku\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 657] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x94\x04\x01A\x02\x01\
+A\x16\x01r\x02\x04roles\x07contents\x03\0\x0cchat-message\x03\0\0\x01p\x01\x01ku\
 \x01ky\x01r\x05\x02ids\x05models\x08messages\x02\x0btemperature\x03\x0amax-token\
 s\x04\x03\0\x0fchat-completion\x03\0\x05\x01r\x04\x02ids\x05models\x07contents\x0d\
 finish-reasons\x03\0\x0dchat-response\x03\0\x07\x01r\x02\x05models\x05inputs\x03\
 \0\x09embedding\x03\0\x09\x01pu\x01r\x02\x05models\x09embedding\x0b\x03\0\x12emb\
-edding-response\x03\0\x0c\x01@\x02\x07api-keys\x0acompletion\x06\0\x08\x04\0\x16\
-create-chat-completion\x01\x0e\x01@\x02\x07api-keys\x09embedding\x0a\0\x0d\x04\0\
-\x10create-embedding\x01\x0f\x04\0\x1dwassemble:openai/openai@0.1.0\x04\0\x0b\x0c\
-\x01\0\x06openai\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-componen\
-t\x070.227.1\x10wit-bindgen-rust\x060.41.0";
+edding-response\x03\0\x0c\x01q\x06\x0erequest-failed\x01s\0\x13response-body-err\
+or\x01s\0\x0autf8-error\x01s\0\x10json-parse-error\x01s\0\x0ano-choices\0\0\x11n\
+o-embedding-data\0\0\x03\0\x0copenai-error\x03\0\x0e\x01j\x01\x08\x01\x0f\x01@\x02\
+\x07api-keys\x0acompletion\x06\0\x10\x04\0\x16create-chat-completion\x01\x11\x01\
+j\x01\x0d\x01\x0f\x01@\x02\x07api-keys\x09embedding\x0a\0\x12\x04\0\x10create-em\
+bedding\x01\x13\x04\0\x1dwassemble:openai/openai@0.1.0\x04\0\x0b\x0c\x01\0\x06op\
+enai\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\
+\x10wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

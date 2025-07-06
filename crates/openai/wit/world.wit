@@ -60,6 +60,22 @@ world openai {
         embedding: list<f64>,
     }
 
+    /// Error types that can occur during OpenAI API operations
+    variant openai-error {
+        /// Failed to send HTTP request
+        request-failed(string),
+        /// Failed to get response body
+        response-body-error(string),
+        /// Failed to parse response as UTF-8
+        utf8-error(string),
+        /// Failed to parse JSON response
+        json-parse-error(string),
+        /// No choices in response
+        no-choices,
+        /// No embedding data in response
+        no-embedding-data,
+    }
+
     /// Creates a chat completion using OpenAI's API
     /// Sends a conversation to OpenAI and returns the assistant's response
     /// 
@@ -67,8 +83,8 @@ world openai {
     /// - api-key: Your OpenAI API key for authentication
     /// - completion: The chat completion configuration and conversation
     /// 
-    /// Returns: The generated response from the assistant
-    export create-chat-completion: func(api-key: string, completion: chat-completion) -> chat-response;
+    /// Returns: The generated response from the assistant or an error
+    export create-chat-completion: func(api-key: string, completion: chat-completion) -> result<chat-response, openai-error>;
 
     /// Creates an embedding vector using OpenAI's API
     /// Converts text into a numerical representation for semantic analysis
@@ -77,6 +93,6 @@ world openai {
     /// - api-key: Your OpenAI API key for authentication
     /// - embedding: The embedding configuration and input text
     /// 
-    /// Returns: The numerical vector representation of the input text
-    export create-embedding: func(api-key: string, embedding: embedding) -> embedding-response;
+    /// Returns: The numerical vector representation of the input text or an error
+    export create-embedding: func(api-key: string, embedding: embedding) -> result<embedding-response, openai-error>;
 }

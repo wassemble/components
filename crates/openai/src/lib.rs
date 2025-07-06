@@ -5,11 +5,9 @@ use bindings::Guest;
 use serde::{Deserialize, Serialize};
 use waki::Client;
 
-use crate::bindings::{ChatCompletion, ChatResponse, Embedding, EmbeddingResponse};
+use crate::bindings::{ChatCompletion, ChatResponse, Embedding, EmbeddingResponse, OpenaiError};
 
 const OPENAI_API_BASE: &str = "https://api.openai.com/v1";
-
-// TODO: remove unwrap
 
 #[derive(Deserialize, Serialize)]
 struct OpenAIChatResponse {
@@ -63,7 +61,10 @@ struct SerializableEmbedding<'a> {
 struct Component;
 
 impl Guest for Component {
-    fn create_chat_completion(api_key: String, completion: ChatCompletion) -> ChatResponse {
+    fn create_chat_completion(
+        api_key: String,
+        completion: ChatCompletion,
+    ) -> Result<ChatResponse, OpenaiError> {
         let messages: Vec<SerializableChatMessage> = completion
             .messages
             .iter()
@@ -78,65 +79,79 @@ impl Guest for Component {
             temperature: completion.temperature,
             max_tokens: completion.max_tokens,
         };
+
         let response = Client::new()
             .post(&format!("{OPENAI_API_BASE}/chat/completions"))
             .header("Authorization", format!("Bearer {api_key}"))
             .header("Content-Type", "application/json")
             .json(&serializable)
             .send()
-            .map_err(|e| format!("Failed to send request: {e}"))
-            .unwrap();
+            .map_err(|e| OpenaiError::RequestFailed(format!("Failed to send request: {e}")))?;
 
-        let body = response
-            .body()
-            .map_err(|e| format!("Failed to get response body: {e}"))
-            .unwrap();
+        let body = response.body().map_err(|e| {
+            OpenaiError::ResponseBodyError(format!("Failed to get response body: {e}"))
+        })?;
 
-        let body_str = String::from_utf8(body)
-            .map_err(|e| format!("Failed to parse response as UTF-8: {e}"))
-            .unwrap();
+        let body_str = String::from_utf8(body).map_err(|e| {
+            OpenaiError::Utf8Error(format!("Failed to parse response as UTF-8: {e}"))
+        })?;
 
-        let openai_response: OpenAIChatResponse = serde_json::from_str(&body_str).unwrap();
-        let choice = &openai_response.choices[0];
+        let openai_response: OpenAIChatResponse = serde_json::from_str(&body_str).map_err(|e| {
+            OpenaiError::JsonParseError(format!("Failed to parse JSON response: {e}"))
+        })?;
 
-        ChatResponse {
+        let choice = openai_response
+            .choices
+            .first()
+            .ok_or(OpenaiError::NoChoices)?;
+
+        Ok(ChatResponse {
             id: openai_response.id,
             model: openai_response.model,
             content: choice.message.content.clone(),
             finish_reason: choice.finish_reason.clone(),
-        }
+        })
     }
 
-    fn create_embedding(api_key: String, embedding: Embedding) -> EmbeddingResponse {
+    fn create_embedding(
+        api_key: String,
+        embedding: Embedding,
+    ) -> Result<EmbeddingResponse, OpenaiError> {
         let serializable = SerializableEmbedding {
             model: &embedding.model,
             input: &embedding.input,
         };
+
         let response = Client::new()
             .post(&format!("{OPENAI_API_BASE}/embeddings"))
             .header("Authorization", format!("Bearer {api_key}"))
             .header("Content-Type", "application/json")
             .json(&serializable)
             .send()
-            .map_err(|e| format!("Failed to send request: {e}"))
-            .unwrap();
+            .map_err(|e| OpenaiError::RequestFailed(format!("Failed to send request: {e}")))?;
 
-        let body = response
-            .body()
-            .map_err(|e| format!("Failed to get response body: {e}"))
-            .unwrap();
+        let body = response.body().map_err(|e| {
+            OpenaiError::ResponseBodyError(format!("Failed to get response body: {e}"))
+        })?;
 
-        let body_str = String::from_utf8(body)
-            .map_err(|e| format!("Failed to parse response as UTF-8: {e}"))
-            .unwrap();
+        let body_str = String::from_utf8(body).map_err(|e| {
+            OpenaiError::Utf8Error(format!("Failed to parse response as UTF-8: {e}"))
+        })?;
 
-        let openai_response: OpenAIEmbeddingResponse = serde_json::from_str(&body_str).unwrap();
-        let data = &openai_response.data[0];
+        let openai_response: OpenAIEmbeddingResponse =
+            serde_json::from_str(&body_str).map_err(|e| {
+                OpenaiError::JsonParseError(format!("Failed to parse JSON response: {e}"))
+            })?;
 
-        EmbeddingResponse {
+        let data = openai_response
+            .data
+            .first()
+            .ok_or(OpenaiError::NoEmbeddingData)?;
+
+        Ok(EmbeddingResponse {
             model: openai_response.model,
             embedding: data.embedding.clone(),
-        }
+        })
     }
 }
 
@@ -185,7 +200,8 @@ mod tests {
             let api_key = get_api_key().unwrap();
             let completion = create_test_chat_completion();
 
-            let response = Component::create_chat_completion(api_key, completion);
+            let response = Component::create_chat_completion(api_key, completion)
+                .expect("Chat completion should succeed");
 
             // Verify response structure
             assert!(!response.id.is_empty(), "Response ID should not be empty");
@@ -229,7 +245,8 @@ mod tests {
                 let mut completion = create_test_chat_completion();
                 completion.model = model.to_string();
 
-                let response = Component::create_chat_completion(api_key.clone(), completion);
+                let response = Component::create_chat_completion(api_key.clone(), completion)
+                    .expect("Chat completion should succeed");
 
                 assert!(
                     !response.content.is_empty(),
@@ -254,7 +271,8 @@ mod tests {
                 let mut completion = create_test_chat_completion();
                 completion.temperature = Some(temp);
 
-                let response = Component::create_chat_completion(api_key.clone(), completion);
+                let response = Component::create_chat_completion(api_key.clone(), completion)
+                    .expect("Chat completion should succeed");
 
                 assert!(
                     !response.content.is_empty(),
@@ -272,7 +290,8 @@ mod tests {
             let mut completion = create_test_chat_completion();
             completion.max_tokens = Some(10);
 
-            let response = Component::create_chat_completion(api_key, completion);
+            let response = Component::create_chat_completion(api_key, completion)
+                .expect("Chat completion should succeed");
 
             assert!(
                 !response.content.is_empty(),
@@ -288,7 +307,8 @@ mod tests {
             let api_key = get_api_key().unwrap();
             let embedding = create_test_embedding();
 
-            let response = Component::create_embedding(api_key, embedding);
+            let response =
+                Component::create_embedding(api_key, embedding).expect("Embedding should succeed");
 
             // Verify response structure
             assert!(
@@ -340,7 +360,8 @@ mod tests {
                     input: input.to_string(),
                 };
 
-                let response = Component::create_embedding(api_key.clone(), embedding);
+                let response = Component::create_embedding(api_key.clone(), embedding)
+                    .expect("Embedding should succeed");
 
                 assert!(
                     !response.embedding.is_empty(),
@@ -363,8 +384,10 @@ mod tests {
             let api_key = get_api_key().unwrap();
             let embedding = create_test_embedding();
 
-            let response1 = Component::create_embedding(api_key.clone(), embedding.clone());
-            let response2 = Component::create_embedding(api_key, embedding);
+            let response1 = Component::create_embedding(api_key.clone(), embedding.clone())
+                .expect("First embedding should succeed");
+            let response2 = Component::create_embedding(api_key, embedding)
+                .expect("Second embedding should succeed");
 
             // Embeddings should be identical for the same input
             assert_eq!(response1.embedding.len(), response2.embedding.len());
@@ -384,7 +407,7 @@ mod tests {
             let completion = create_test_chat_completion();
 
             let result = std::panic::catch_unwind(|| {
-                Component::create_chat_completion(invalid_api_key, completion);
+                let _ = Component::create_chat_completion(invalid_api_key, completion);
             });
 
             assert!(result.is_err(), "Should panic with invalid API key");
@@ -398,7 +421,7 @@ mod tests {
             let embedding = create_test_embedding();
 
             let result = std::panic::catch_unwind(|| {
-                Component::create_embedding(invalid_api_key, embedding);
+                let _ = Component::create_embedding(invalid_api_key, embedding);
             });
 
             assert!(result.is_err(), "Should panic with invalid API key");
@@ -422,7 +445,8 @@ mod tests {
                 max_tokens: Some(100),
             };
 
-            let response1 = Component::create_chat_completion(api_key.clone(), completion1);
+            let response1 = Component::create_chat_completion(api_key.clone(), completion1)
+                .expect("First chat completion should succeed");
             assert!(!response1.content.is_empty());
 
             // Follow-up message using the response
@@ -447,7 +471,8 @@ mod tests {
                 max_tokens: Some(100),
             };
 
-            let response2 = Component::create_chat_completion(api_key, completion2);
+            let response2 = Component::create_chat_completion(api_key, completion2)
+                .expect("Second chat completion should succeed");
             assert!(!response2.content.is_empty());
             assert_ne!(
                 response1.content, response2.content,
@@ -473,7 +498,8 @@ mod tests {
         run_if_api_key_available(|| {
             let api_key = get_api_key().unwrap();
             let completion = create_test_chat_completion();
-            let response = Component::create_chat_completion(api_key, completion);
+            let response = Component::create_chat_completion(api_key, completion)
+                .expect("Chat completion should succeed");
             assert!(!response.content.is_empty());
         });
     }

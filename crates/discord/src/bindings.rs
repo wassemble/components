@@ -75,8 +75,7 @@ pub unsafe fn _export_create_webhook_cabi<T: Guest>(
     arg4: *mut u8,
     arg5: usize,
 ) -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -89,62 +88,40 @@ pub unsafe fn _export_create_webhook_cabi<T: Guest>(
         _rt::string_lift(bytes2),
     );
     let ptr4 = (&raw mut _RET_AREA.0).cast::<u8>();
-    let Webhook {
-        id: id5,
-        token: token5,
-        url: url5,
-    } = result3;
+    let Webhook { id: id5, token: token5, url: url5 } = result3;
     let vec6 = (id5.into_bytes()).into_boxed_slice();
     let ptr6 = vec6.as_ptr().cast::<u8>();
     let len6 = vec6.len();
     ::core::mem::forget(vec6);
-    *ptr4
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len6;
+    *ptr4.add(::core::mem::size_of::<*const u8>()).cast::<usize>() = len6;
     *ptr4.add(0).cast::<*mut u8>() = ptr6.cast_mut();
     let vec7 = (token5.into_bytes()).into_boxed_slice();
     let ptr7 = vec7.as_ptr().cast::<u8>();
     let len7 = vec7.len();
     ::core::mem::forget(vec7);
-    *ptr4
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len7;
-    *ptr4
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr7.cast_mut();
+    *ptr4.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len7;
+    *ptr4.add(2 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr7
+        .cast_mut();
     let vec8 = (url5.into_bytes()).into_boxed_slice();
     let ptr8 = vec8.as_ptr().cast::<u8>();
     let len8 = vec8.len();
     ::core::mem::forget(vec8);
-    *ptr4
-        .add(5 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len8;
-    *ptr4
-        .add(4 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr8.cast_mut();
+    *ptr4.add(5 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len8;
+    *ptr4.add(4 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr8
+        .cast_mut();
     ptr4
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_create_webhook<T: Guest>(arg0: *mut u8) {
     let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l0, l1, 1);
-    let l2 = *arg0
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l3 = *arg0
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l2 = *arg0.add(2 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>();
+    let l3 = *arg0.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l2, l3, 1);
-    let l4 = *arg0
-        .add(4 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l5 = *arg0
-        .add(5 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l4 = *arg0.add(4 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>();
+    let l5 = *arg0.add(5 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l4, l5, 1);
 }
 #[doc(hidden)]
@@ -157,8 +134,7 @@ pub unsafe fn _export_delete_webhook_cabi<T: Guest>(
     arg4: *mut u8,
     arg5: usize,
 ) -> i32 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -185,8 +161,7 @@ pub unsafe fn _export_delete_message_cabi<T: Guest>(
     arg4: *mut u8,
     arg5: usize,
 ) -> i32 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -215,8 +190,7 @@ pub unsafe fn _export_edit_message_cabi<T: Guest>(
     arg6: *mut u8,
     arg7: usize,
 ) -> i32 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -244,61 +218,43 @@ pub unsafe fn _export_get_channel_cabi<T: Guest>(
     arg2: *mut u8,
     arg3: usize,
 ) -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
     let bytes1 = _rt::Vec::from_raw_parts(arg2.cast(), len1, len1);
     let result2 = T::get_channel(_rt::string_lift(bytes0), _rt::string_lift(bytes1));
     let ptr3 = (&raw mut _RET_AREA.0).cast::<u8>();
-    let Channel {
-        id: id4,
-        name: name4,
-        ty: ty4,
-        guild_id: guild_id4,
-    } = result2;
+    let Channel { id: id4, name: name4, ty: ty4, guild_id: guild_id4 } = result2;
     let vec5 = (id4.into_bytes()).into_boxed_slice();
     let ptr5 = vec5.as_ptr().cast::<u8>();
     let len5 = vec5.len();
     ::core::mem::forget(vec5);
-    *ptr3
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len5;
+    *ptr3.add(::core::mem::size_of::<*const u8>()).cast::<usize>() = len5;
     *ptr3.add(0).cast::<*mut u8>() = ptr5.cast_mut();
     let vec6 = (name4.into_bytes()).into_boxed_slice();
     let ptr6 = vec6.as_ptr().cast::<u8>();
     let len6 = vec6.len();
     ::core::mem::forget(vec6);
-    *ptr3
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len6;
-    *ptr3
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr6.cast_mut();
-    *ptr3
-        .add(4 * ::core::mem::size_of::<*const u8>())
-        .cast::<i32>() = _rt::as_i32(ty4);
+    *ptr3.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len6;
+    *ptr3.add(2 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr6
+        .cast_mut();
+    *ptr3.add(4 * ::core::mem::size_of::<*const u8>()).cast::<i32>() = _rt::as_i32(ty4);
     match guild_id4 {
         Some(e) => {
-            *ptr3
-                .add(5 * ::core::mem::size_of::<*const u8>())
-                .cast::<u8>() = (1i32) as u8;
+            *ptr3.add(5 * ::core::mem::size_of::<*const u8>()).cast::<u8>() = (1i32)
+                as u8;
             let vec7 = (e.into_bytes()).into_boxed_slice();
             let ptr7 = vec7.as_ptr().cast::<u8>();
             let len7 = vec7.len();
             ::core::mem::forget(vec7);
-            *ptr3
-                .add(7 * ::core::mem::size_of::<*const u8>())
-                .cast::<usize>() = len7;
-            *ptr3
-                .add(6 * ::core::mem::size_of::<*const u8>())
-                .cast::<*mut u8>() = ptr7.cast_mut();
+            *ptr3.add(7 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len7;
+            *ptr3.add(6 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr7
+                .cast_mut();
         }
         None => {
-            *ptr3
-                .add(5 * ::core::mem::size_of::<*const u8>())
-                .cast::<u8>() = (0i32) as u8;
+            *ptr3.add(5 * ::core::mem::size_of::<*const u8>()).cast::<u8>() = (0i32)
+                as u8;
         }
     };
     ptr3
@@ -307,31 +263,19 @@ pub unsafe fn _export_get_channel_cabi<T: Guest>(
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_get_channel<T: Guest>(arg0: *mut u8) {
     let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l0, l1, 1);
-    let l2 = *arg0
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l3 = *arg0
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l2 = *arg0.add(2 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>();
+    let l3 = *arg0.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l2, l3, 1);
-    let l4 = i32::from(
-        *arg0
-            .add(5 * ::core::mem::size_of::<*const u8>())
-            .cast::<u8>(),
-    );
+    let l4 = i32::from(*arg0.add(5 * ::core::mem::size_of::<*const u8>()).cast::<u8>());
     match l4 {
         0 => {}
         _ => {
             let l5 = *arg0
                 .add(6 * ::core::mem::size_of::<*const u8>())
                 .cast::<*mut u8>();
-            let l6 = *arg0
-                .add(7 * ::core::mem::size_of::<*const u8>())
-                .cast::<usize>();
+            let l6 = *arg0.add(7 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
             _rt::cabi_dealloc(l5, l6, 1);
         }
     }
@@ -344,8 +288,7 @@ pub unsafe fn _export_get_user_cabi<T: Guest>(
     arg2: *mut u8,
     arg3: usize,
 ) -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -362,50 +305,37 @@ pub unsafe fn _export_get_user_cabi<T: Guest>(
     let ptr5 = vec5.as_ptr().cast::<u8>();
     let len5 = vec5.len();
     ::core::mem::forget(vec5);
-    *ptr3
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len5;
+    *ptr3.add(::core::mem::size_of::<*const u8>()).cast::<usize>() = len5;
     *ptr3.add(0).cast::<*mut u8>() = ptr5.cast_mut();
     let vec6 = (username4.into_bytes()).into_boxed_slice();
     let ptr6 = vec6.as_ptr().cast::<u8>();
     let len6 = vec6.len();
     ::core::mem::forget(vec6);
-    *ptr3
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len6;
-    *ptr3
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr6.cast_mut();
+    *ptr3.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len6;
+    *ptr3.add(2 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr6
+        .cast_mut();
     let vec7 = (discriminator4.into_bytes()).into_boxed_slice();
     let ptr7 = vec7.as_ptr().cast::<u8>();
     let len7 = vec7.len();
     ::core::mem::forget(vec7);
-    *ptr3
-        .add(5 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len7;
-    *ptr3
-        .add(4 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>() = ptr7.cast_mut();
+    *ptr3.add(5 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len7;
+    *ptr3.add(4 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr7
+        .cast_mut();
     match avatar4 {
         Some(e) => {
-            *ptr3
-                .add(6 * ::core::mem::size_of::<*const u8>())
-                .cast::<u8>() = (1i32) as u8;
+            *ptr3.add(6 * ::core::mem::size_of::<*const u8>()).cast::<u8>() = (1i32)
+                as u8;
             let vec8 = (e.into_bytes()).into_boxed_slice();
             let ptr8 = vec8.as_ptr().cast::<u8>();
             let len8 = vec8.len();
             ::core::mem::forget(vec8);
-            *ptr3
-                .add(8 * ::core::mem::size_of::<*const u8>())
-                .cast::<usize>() = len8;
-            *ptr3
-                .add(7 * ::core::mem::size_of::<*const u8>())
-                .cast::<*mut u8>() = ptr8.cast_mut();
+            *ptr3.add(8 * ::core::mem::size_of::<*const u8>()).cast::<usize>() = len8;
+            *ptr3.add(7 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>() = ptr8
+                .cast_mut();
         }
         None => {
-            *ptr3
-                .add(6 * ::core::mem::size_of::<*const u8>())
-                .cast::<u8>() = (0i32) as u8;
+            *ptr3.add(6 * ::core::mem::size_of::<*const u8>()).cast::<u8>() = (0i32)
+                as u8;
         }
     };
     ptr3
@@ -414,38 +344,22 @@ pub unsafe fn _export_get_user_cabi<T: Guest>(
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_get_user<T: Guest>(arg0: *mut u8) {
     let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l0, l1, 1);
-    let l2 = *arg0
-        .add(2 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l3 = *arg0
-        .add(3 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l2 = *arg0.add(2 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>();
+    let l3 = *arg0.add(3 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l2, l3, 1);
-    let l4 = *arg0
-        .add(4 * ::core::mem::size_of::<*const u8>())
-        .cast::<*mut u8>();
-    let l5 = *arg0
-        .add(5 * ::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l4 = *arg0.add(4 * ::core::mem::size_of::<*const u8>()).cast::<*mut u8>();
+    let l5 = *arg0.add(5 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l4, l5, 1);
-    let l6 = i32::from(
-        *arg0
-            .add(6 * ::core::mem::size_of::<*const u8>())
-            .cast::<u8>(),
-    );
+    let l6 = i32::from(*arg0.add(6 * ::core::mem::size_of::<*const u8>()).cast::<u8>());
     match l6 {
         0 => {}
         _ => {
             let l7 = *arg0
                 .add(7 * ::core::mem::size_of::<*const u8>())
                 .cast::<*mut u8>();
-            let l8 = *arg0
-                .add(8 * ::core::mem::size_of::<*const u8>())
-                .cast::<usize>();
+            let l8 = *arg0.add(8 * ::core::mem::size_of::<*const u8>()).cast::<usize>();
             _rt::cabi_dealloc(l7, l8, 1);
         }
     }
@@ -463,8 +377,7 @@ pub unsafe fn _export_send_message_cabi<T: Guest>(
     arg7: *mut u8,
     arg8: usize,
 ) -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -495,9 +408,7 @@ pub unsafe fn _export_send_message_cabi<T: Guest>(
     let ptr6 = vec6.as_ptr().cast::<u8>();
     let len6 = vec6.len();
     ::core::mem::forget(vec6);
-    *ptr5
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len6;
+    *ptr5.add(::core::mem::size_of::<*const u8>()).cast::<usize>() = len6;
     *ptr5.add(0).cast::<*mut u8>() = ptr6.cast_mut();
     ptr5
 }
@@ -505,9 +416,7 @@ pub unsafe fn _export_send_message_cabi<T: Guest>(
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_send_message<T: Guest>(arg0: *mut u8) {
     let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l0, l1, 1);
 }
 #[doc(hidden)]
@@ -524,8 +433,7 @@ pub unsafe fn _export_send_webhook_message_cabi<T: Guest>(
     arg8: *mut u8,
     arg9: usize,
 ) -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     let len1 = arg3;
@@ -550,9 +458,7 @@ pub unsafe fn _export_send_webhook_message_cabi<T: Guest>(
     let ptr7 = vec7.as_ptr().cast::<u8>();
     let len7 = vec7.len();
     ::core::mem::forget(vec7);
-    *ptr6
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len7;
+    *ptr6.add(::core::mem::size_of::<*const u8>()).cast::<usize>() = len7;
     *ptr6.add(0).cast::<*mut u8>() = ptr7.cast_mut();
     ptr6
 }
@@ -560,20 +466,25 @@ pub unsafe fn _export_send_webhook_message_cabi<T: Guest>(
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_send_webhook_message<T: Guest>(arg0: *mut u8) {
     let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l0, l1, 1);
 }
 pub trait Guest {
-    fn create_webhook(token: _rt::String, channel_id: _rt::String, name: _rt::String) -> Webhook;
+    fn create_webhook(
+        token: _rt::String,
+        channel_id: _rt::String,
+        name: _rt::String,
+    ) -> Webhook;
     fn delete_webhook(
         token: _rt::String,
         webhook_id: _rt::String,
         webhook_token: _rt::String,
     ) -> bool;
-    fn delete_message(token: _rt::String, channel_id: _rt::String, message_id: _rt::String)
-    -> bool;
+    fn delete_message(
+        token: _rt::String,
+        channel_id: _rt::String,
+        message_id: _rt::String,
+    ) -> bool;
     fn edit_message(
         token: _rt::String,
         channel_id: _rt::String,
@@ -645,8 +556,9 @@ pub(crate) use __export_world_discord_cabi;
 #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
 #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
 struct _RetArea([::core::mem::MaybeUninit<u8>; 9 * ::core::mem::size_of::<*const u8>()]);
-static mut _RET_AREA: _RetArea =
-    _RetArea([::core::mem::MaybeUninit::uninit(); 9 * ::core::mem::size_of::<*const u8>()]);
+static mut _RET_AREA: _RetArea = _RetArea(
+    [::core::mem::MaybeUninit::uninit(); 9 * ::core::mem::size_of::<*const u8>()],
+);
 #[rustfmt::skip]
 mod _rt {
     #![allow(dead_code, clippy::all)]
@@ -769,7 +681,9 @@ macro_rules! __export_discord_impl {
 #[doc(inline)]
 pub(crate) use __export_discord_impl as export;
 #[cfg(target_arch = "wasm32")]
-#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:wassemble:discord@0.1.0:discord:encoded world")]
+#[unsafe(
+    link_section = "component-type:wit-bindgen:0.41.0:wassemble:discord@0.1.0:discord:encoded world"
+)]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
 pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 731] = *b"\

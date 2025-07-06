@@ -4,17 +4,14 @@
 #[doc(hidden)]
 #[allow(non_snake_case)]
 pub unsafe fn _export_hello_world_cabi<T: Guest>() -> *mut u8 {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let result0 = T::hello_world();
     let ptr1 = (&raw mut _RET_AREA.0).cast::<u8>();
     let vec2 = (result0.into_bytes()).into_boxed_slice();
     let ptr2 = vec2.as_ptr().cast::<u8>();
     let len2 = vec2.len();
     ::core::mem::forget(vec2);
-    *ptr1
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>() = len2;
+    *ptr1.add(::core::mem::size_of::<*const u8>()).cast::<usize>() = len2;
     *ptr1.add(0).cast::<*mut u8>() = ptr2.cast_mut();
     ptr1
 }
@@ -22,9 +19,7 @@ pub unsafe fn _export_hello_world_cabi<T: Guest>() -> *mut u8 {
 #[allow(non_snake_case)]
 pub unsafe fn __post_return_hello_world<T: Guest>(arg0: *mut u8) {
     let l0 = *arg0.add(0).cast::<*mut u8>();
-    let l1 = *arg0
-        .add(::core::mem::size_of::<*const u8>())
-        .cast::<usize>();
+    let l1 = *arg0.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
     _rt::cabi_dealloc(l0, l1, 1);
 }
 pub trait Guest {
@@ -46,8 +41,9 @@ pub(crate) use __export_world_hello_world_cabi;
 #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
 #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
 struct _RetArea([::core::mem::MaybeUninit<u8>; 2 * ::core::mem::size_of::<*const u8>()]);
-static mut _RET_AREA: _RetArea =
-    _RetArea([::core::mem::MaybeUninit::uninit(); 2 * ::core::mem::size_of::<*const u8>()]);
+static mut _RET_AREA: _RetArea = _RetArea(
+    [::core::mem::MaybeUninit::uninit(); 2 * ::core::mem::size_of::<*const u8>()],
+);
 #[rustfmt::skip]
 mod _rt {
     #![allow(dead_code, clippy::all)]
@@ -96,7 +92,9 @@ macro_rules! __export_hello_world_impl {
 #[doc(inline)]
 pub(crate) use __export_hello_world_impl as export;
 #[cfg(target_arch = "wasm32")]
-#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:wassemble:hello-world:hello-world:encoded world")]
+#[unsafe(
+    link_section = "component-type:wit-bindgen:0.41.0:wassemble:hello-world:hello-world:encoded world"
+)]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
 pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 194] = *b"\
