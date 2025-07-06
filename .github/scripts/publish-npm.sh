@@ -16,19 +16,25 @@ cd npm/$1
 # Create package.json
 cat > package.json << EOF
 {
+  "author": "Wassemble (https://github.com/wassemble/components)",
+  "dependencies": {
+    "@bytecodealliance/preview2-shim": "^0.17.2"
+  },
+  "description": "WebAssembly component for $1",
+  "license": "Apache-2.0",
+  "main": "$safe_component.js",
   "name": "@wassemble/$1",
-  "version": "$version",
-  "type": "module",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/wassemble/components.git"
   },
-  "author": "Wassemble (https://github.com/wassemble/components)",
-  "license": "Apache-2.0",
-  "description": "WebAssembly component for $1"
+  "type": "module",
+  "version": "$version"
 }
 EOF
+
+# Dependencies
+npm install @bytecodealliance/preview2-shim
 
 # Generate README.md
 cd ../..
