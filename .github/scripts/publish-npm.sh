@@ -18,6 +18,7 @@ cat > package.json << EOF
 {
   "name": "@wassemble/$1",
   "version": "$version",
+  "type": "module",
   "main": "index.js",
   "repository": {
     "type": "git",
